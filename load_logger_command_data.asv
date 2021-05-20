@@ -1,6 +1,11 @@
 function [data] = load_logger_command_data(data_dir, bat_id)
-%LOAD_LOGGER_COMMAND_DATA Summary of this function goes here
-%   Detailed explanation goes here
+%LOAD_LOGGER_COMMAND_DATA Loads data from extract_logger_data output
+%   Parameters
+%   ---------- 
+%   data_dir 
+%       path to folder containing data files & extracted_data/ subfolder
+%       from extract_logger_data script
+
 
 %% Parameters
 
@@ -16,8 +21,10 @@ for i=1:length(files)
         re_match = regexp(fname, '\d*\_\d*_CSC(\d*)\.mat', 'tokens');
         channel_num = uint8(str2double(re_match{1}{1}))+1;
         disp(channel_num);
-        temp_struct = load(fullfile(data_dir, 'extracted_data', fname), 'AD_count_int16');
+        temp_struct = load(fullfile(data_dir, 'extracted_data', fname));
         data.csc(:,channel_num) = temp_struct.AD_count_int16;
+        data.timestamps_first_samples_logger_usec{channel_num} = temp_struct.Timestamps_of_first_samples_usec_Logger;
+        data.sampling_period_usec = temp_struct.Sampling_period_usec_Logger;
     end
     
     if regexp(fname, '\d*\_\d*_EVENTS.mat')
@@ -29,8 +36,10 @@ for i=1:length(files)
     end
 end
 figure;
-for i=1:size(data.csc,1)
-    plot(data.csc(10000
+for i=1:size(data.csc,2)
+    plot(data.csc(10000:10500,i));
+    hold on;
+end
 
 figure;
 stem(data.ttl_timestamps_usec, ones(size(data.ttl_timestamps_usec)));

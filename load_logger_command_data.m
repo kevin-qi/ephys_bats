@@ -1,9 +1,12 @@
 function [data] = load_logger_command_data(data_dir, bat_id)
-%LOAD_LOGGER_COMMAND_DATA Summary of this function goes here
-%   Detailed explanation goes here
-
-%% Parameters
-
+%LOAD_LOGGER_COMMAND_DATA Loads data from extract_logger_data output
+%   Parameters
+%   ---------- 
+%   data_dir 
+%       path to folder containing data files & extracted_data/ subfolder
+%       from extract_logger_data script
+%   bat_id
+%       bat ID
 
 %% Load CSC data
 files = dir(fullfile(data_dir, 'extracted_data'));
@@ -12,6 +15,9 @@ for i=1:length(files)
     file = files(i);
     fname = file.name;
     
+    % Loads all N channels of CSC data into a matrix with N rows
+    % Also loads some relevant information such as first sample timestamps
+    % and sampling period
     if regexp(fname, '\d*\_\d*_CSC(\d*)\.mat')
         re_match = regexp(fname, '\d*\_\d*_CSC(\d*)\.mat', 'tokens');
         channel_num = uint8(str2double(re_match{1}{1}))+1;
@@ -22,6 +28,7 @@ for i=1:length(files)
         data.sampling_period_usec = temp_struct.Sampling_period_usec_Logger;
     end
     
+    % Loads events information / TTL timings.
     if regexp(fname, '\d*\_\d*_EVENTS.mat')
         temp_struct = load(fullfile(data_dir, 'extracted_data', fname));
         data.event_types = temp_struct.event_types_and_details;
@@ -30,12 +37,8 @@ for i=1:length(files)
         data.ttl_timestamps_usec = data.events_timestamps_usec(data.ttl_ind);
     end
 end
-figure;
-for i=1:size(data.csc,2)
-    plot(data.csc(10000:10500,i));
-    hold on;
-end
 
+% Plotting TTL
 figure;
 stem(data.ttl_timestamps_usec, ones(size(data.ttl_timestamps_usec)));
 end
