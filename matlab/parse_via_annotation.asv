@@ -22,6 +22,7 @@ function [output] = parse_via_annotation(filepath, fps, varargin)
 %           1/fps
 %       out.frames
 %           Chunk & Activity of each frame
+%       out.processed_annotations
 
 %% Parse inputs
 defaultActivityKey = '1';
