@@ -117,8 +117,7 @@ for frame=first_annotated_frame:last_annotated_frame
     data(frame).chunk = 'null';
     data(frame).activity = 'null';
 end
-    
-
+chunks = struct();
 for i=1:height(annotations)
     temp_coord = jsondecode(annotations.temporal_coordinates{i});
     if(length(temp_coord)==2) % Temporal segments should have start and end
@@ -155,6 +154,15 @@ for i=1:height(annotations)
                     disp(frame_start);
                     disp(frame_end);
                     label = annotations.label{i};
+                    act.label = label;
+                    act.frame_start = frame_start;
+                    act.frame_end = frame_end;
+                    ch_name = sprintf('%s_%d', chunk_name, j);
+                    if(~ismember(ch_name, fieldnames(chunks)))
+                        chunks.(ch_name) = [act];
+                    else
+                        chunks.(ch_name) = [chunks.(ch_name) act]; 
+                    end
                     for frame=frame_start:frame_end
                         data(frame).chunk = sprintf('%s_%d', chunk_name, j);
                         data(frame).activity = label;
@@ -169,11 +177,12 @@ end
 output.processed_annotations = annotations;
 output.chunk_indices = chunk_indices;
 output.chunk_key = chunk_key;
-output.chunk = chunk;
-output.activity = activity;
+output.chunk_names = chunk;
+output.activity_names = activity;
 output.T = 1/fps;
 output.fps = fps;
 output.frames = data;
+output.chunks = chunks;
 %outputArg2 = inputArg2;
 end
 

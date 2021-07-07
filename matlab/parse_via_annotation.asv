@@ -22,7 +22,6 @@ function [output] = parse_via_annotation(filepath, fps, varargin)
 %           1/fps
 %       out.frames
 %           Chunk & Activity of each frame
-%       out.processed_annotations
 
 %% Parse inputs
 defaultActivityKey = '1';
@@ -118,7 +117,6 @@ for frame=first_annotated_frame:last_annotated_frame
     data(frame).chunk = 'null';
     data(frame).activity = 'null';
 end
-    
 
 for i=1:height(annotations)
     temp_coord = jsondecode(annotations.temporal_coordinates{i});
@@ -156,6 +154,10 @@ for i=1:height(annotations)
                     disp(frame_start);
                     disp(frame_end);
                     label = annotations.label{i};
+                    act.label = label;
+                    act.frame_start = frame_start;
+                    act.frame_end = frame_end;
+                    chunks.([chunk_name j]) = act; 
                     for frame=frame_start:frame_end
                         data(frame).chunk = sprintf('%s_%d', chunk_name, j);
                         data(frame).activity = label;
@@ -170,8 +172,8 @@ end
 output.processed_annotations = annotations;
 output.chunk_indices = chunk_indices;
 output.chunk_key = chunk_key;
-output.chunk = chunk;
-output.activity = activity;
+output.chunk_names = chunk;
+output.activity_names = activity;
 output.T = 1/fps;
 output.fps = fps;
 output.frames = data;
