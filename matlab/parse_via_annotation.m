@@ -174,7 +174,7 @@ for i=1:height(annotations)
 end
 
 
-output.processed_annotations = annotations;
+output.annotations = annotations;
 output.chunk_indices = chunk_indices;
 output.chunk_key = chunk_key;
 output.chunk_names = chunk;
@@ -183,6 +183,13 @@ output.T = 1/fps;
 output.fps = fps;
 output.frames = data;
 output.chunks = chunks;
+
+
+[dir, name, ext] = fileparts(filepath);
+if(~isfolder(fullfile(dir,'output')))
+    mkdir(fullfile(dir,'output'));
+end
+save(fullfile(dir,'output','processed_annotation.mat'), 'output');
 %outputArg2 = inputArg2;
 end
 
